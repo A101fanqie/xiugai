@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网课进度查询</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ffffff, #f5f7fa);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            animation: containerFadeIn 0.8s ease;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            max-width: 90%;
+            width: 420px;
+            transition: all 0.4s ease;
+        }
+
+        @keyframes containerFadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(5px);
+            border: 2px solid #edf2f7;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #2d3748;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: #a0aec0;
+        }
+
+        input:focus {
+            background: white;
+            transform: translateY(-2px);
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+        }
+
+        button {
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            background-size: 200% 200%;
+            animation: gradientMove 3s ease infinite;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.2);
+            background: linear-gradient(45deg, #2ecc71, #3498db);
+            background-size: 200% 200%;
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #f8fafc, #e0f2fe, #f0f9ff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .notice-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            text-align: left;
+        }
+
+        .notice-title {
+            color: #2c3e50;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .notice-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .notice-item {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+        }
+
+        .notice-item:before {
+            content: "•";
+            color: #3498db;
+            position: absolute;
+            left: 0.5rem;
+            font-weight: bold;
+        }
+
+        .notice-item:hover {
+            transform: translateX(5px);
+            color: #3498db;
+        }
+
+        @media (max-width: 480px) {
+            .notice-item {
+                font-size: 0.85rem;
+            }
+        }
+
+        .contact-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .contact-title {
+            color: #2c3e50;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .contact-item {
+            background: linear-gradient(135deg, #f8fafc, #f0f9ff);
+            animation: contactPulse 2s infinite;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            color: #3498db;
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: inline-block;
+            border: 2px solid #edf2f7;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        @keyframes contactPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .contact-item:hover {
+            background: #fff;
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
+        }
+
+        .contact-divider {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+
+        .qq-info {
+            color: #e74c3c;  /* QQ的颜色稍微区分一下 */
+        }
+
+        .contact-note {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 0.8rem;
+        }
+
+        .result-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .result-frame {
+            width: 100%;
+            height: calc(100% - 55px);
+            border: none;
+            margin: 0;
+            padding: 0;
+            display: block;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            background-size: 200% 200%;
+            animation: gradientMove 3s ease infinite;
+            color: white;
+            padding: 15px 0;
+            cursor: pointer;
+            z-index: 1001;
+            border: none;
+            font-weight: 600;
+            display: none;
+            transform: none;
+            border-radius: 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-button.show {
+            display: block;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(45deg, #2ecc71, #3498db);
+            background-size: 200% 200%;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+                width: calc(100% - 2rem);
+            }
+
+            .result-container {
+                padding: 0;
+            }
+
+            .back-button {
+                bottom: 30px;
+                padding: 15px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.7);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 90%;
+            width: 360px;
+        }
+
+        .popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .popup-icon {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #e1f5fe, #e3f2fd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: iconRotate 20s linear infinite;
+        }
+
+        @keyframes iconRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .popup-icon svg {
+            width: 45px;
+            height: 45px;
+            color: #3498db;
+            stroke-width: 2;
+        }
+
+        .popup-message {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            padding: 0 10px;
+        }
+
+        .popup-submessage {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .popup-button {
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .popup-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.2);
+            background: linear-gradient(45deg, #2ecc71, #3498db);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(3px);
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="popup" id="welcomePopup">
+        <div class="popup-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="popup-message">
+            温馨提示
+        </div>
+        <div class="popup-submessage">
+            查询不到就是没有下单哦亲亲～<br>
+            如有疑问请联系客服微信
+        </div>
+        <button class="popup-button" onclick="closePopup()">我知道啦</button>
+    </div>
+
+    <div class="background-animation"></div>
+    <div class="container">
+        <div class="logo">🎓</div>
+        <h2>网课进度查询</h2>
+        <div class="input-group">
+            <input type="text" id="queryId" placeholder="请输入手机号查询" autocomplete="off">
+        </div>
+        <button onclick="query()">查询进度</button>
+
+        <div id="resultContainer" class="result-container">
+            <iframe id="resultFrame" class="result-frame" frameborder="0"></iframe>
+        </div>
+        <button id="backButton" class="back-button" onclick="goBack()">返回查询</button>
+
+        <div class="notice-section">
+            <div class="notice-title">注意事项</div>
+            <ul class="notice-list">
+                <li class="notice-item">请使用下单时的手机号进行查询</li>
+                <li class="notice-item">如遇查询问题，请联系客服处理</li>
+                <li class="notice-item">系统每10分钟更新一次学习进度</li>
+                <li class="notice-item">请确保手机号输入正确，否则将无法查询</li>
+                <li class="notice-item">点击查询进度如果短暂白屏属于正常现象，稍等片刻即可</li>
+            </ul>
+        </div>
+
+        <div class="contact-section">
+            <div class="contact-title">
+                <span>📱 客服微信</span>
+            </div>
+            <div class="contact-info">
+                <div class="contact-item">kk698273</div>
+            </div>
+            <div class="contact-note">工作时间：周一至周日 8:00-23:00</div>
+        </div>
+    </div>
+
+    <script>
+        function query() {
+            const queryId = document.getElementById('queryId').value.trim();
+            if (!queryId) {
+                alert('请输入手机号');
+                return;
+            }
+
+            document.getElementById('resultContainer').classList.add('show');
+            document.getElementById('backButton').classList.add('show');
+            document.getElementById('resultFrame').src = `https://b.pengzi.cc/query/?user=${queryId}`;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function goBack() {
+            document.getElementById('resultContainer').classList.remove('show');
+            document.getElementById('backButton').classList.remove('show');
+            document.getElementById('resultFrame').src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('queryId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                query();
+            }
+        });
+
+        function showPopup() {
+            document.getElementById('welcomePopup').classList.add('show');
+            document.getElementById('popupOverlay').classList.add('show');
+            document.querySelector('.popup-icon').style.animation = 'pulseIcon 2s infinite';
+        }
+
+        function closePopup() {
+            document.getElementById('welcomePopup').classList.remove('show');
+            document.getElementById('popupOverlay').classList.remove('show');
+        }
+
+        window.addEventListener('load', function() {
+            setTimeout(showPopup, 800);
+        });
+
+        document.getElementById('popupOverlay').addEventListener('click', closePopup);
+    </script>
+</body>
+</html> 
